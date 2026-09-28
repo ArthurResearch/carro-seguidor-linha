@@ -1,7 +1,7 @@
 //Variáveis para sensores de linha e velocidade
 
 int sensorDD, sensorDM, sensorMD, sensorME, sensorEM, sensorEE; // Sensores - D = Direita, M = Meio, E = Esquerda
-int velMin = 70, velMed = 120, velMax = 185; // Velocidade dos motores - 0 a 255
+int velMin = 70, velMed = 70, velMax = 185; // Velocidade dos motores - 0 a 255
 int limiar = 600; // Limiar do sensor de luz - acima de 600 = preto, abaixo de 600 = branco
 
 //Variáveis para sensores de início e fim de pista
@@ -15,14 +15,14 @@ long tempoExtra = 2000; // Tempo extra para funcionar depois da última marca do
 // Definições dos pinos do Arduino ligados a entrada da Ponte H
 
 // Motor Esquerdo
-int ENA = 5;
+int ENA = 10;
 int IN1 = 7;
 int IN2 = 6;
 
 // Motor Direito
-int ENB = 3;
-int IN3 = 4;
-int IN4 = 2;
+int ENB = 9;
+int IN3 = 5;
+int IN4 = 4;
 
 // Define os pinos como saida e como entrada
 
@@ -46,12 +46,50 @@ void setup(){
 
 // Controle dos motores
 
+/*
 void controlaMotores(int velE, int velD) {
   analogWrite(ENA, velE);
   analogWrite(ENB, velD);
 
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+*/
+
+void frente(int vel) {
+  //esquerdo
+  analogWrite(ENA, vel);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+
+  //direito
+  analogWrite(ENB, vel);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+void direita(int vel) {
+  //esquerdo
+  analogWrite(ENA, vel);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+
+  //direito
+  analogWrite(ENB, vel);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+
+void esquerda(int vel) {
+  //esquerdo
+  analogWrite(ENA, vel);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+
+  //direito
+  analogWrite(ENB, vel);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
 }
@@ -74,22 +112,36 @@ void segueLinha(){
   sensorDM = analogRead(A4);
   sensorDD = analogRead(A5);
 
-  if (/* esquerda forte */) {
-    controlaMotores(velMin, velMax);
+  if (sensorME < limiar || sensorMD < limiar){
+    Serial.println("para_frente");
+    frente(velMed);    
   }
-  else if (/* direita forte*/) {
-    controlaMotores(velMax, velMin);
+  if (sensorEM < limiar || sensorEE < limiar){
+    Serial.println("para_esquerda");
+    esquerda(velMed);    
   }
-  else if (/* esquerda */) {
-    controlaMotores(velMed, velMax);
-  }
-  else if (/* direita */) {
-    controlaMotores(velMax, velMed);
-  }
-  else if (/* centro */) {
-    controlaMotores(velMax, velMax);
+  if (sensorDM < limiar || sensorDD < limiar){
+    Serial.println("para_direita");
+    direita(velMed);
   }
 
+  /*
+  if (/* esquerda forte) {
+    controlaMotores(velMin, velMax);
+  }
+  else if (/* direita forte) {
+    controlaMotores(velMax, velMin);
+  }
+  else if (/* esquerda) {
+    controlaMotores(velMed, velMax);
+  }
+  else if (/* direita) {
+    controlaMotores(velMax, velMed);
+  }
+  else if (/* centro) {
+    controlaMotores(velMax, velMax);
+  }
+  */
   // Teste dos sensores
   /*
   Serial.print(sensorEE);
